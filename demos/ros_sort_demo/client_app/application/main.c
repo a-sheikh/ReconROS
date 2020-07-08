@@ -236,7 +236,7 @@ int main(int argc, char **argv)
 
 	settings[0].cnt = 0;
 	settings[0].mode = MODE_PUBLISHER;
-	settings[0].wait_time = 1000000;
+	settings[0].wait_time = 2000000;
 	settings[0].msg = (uint8_t*)u32usorted;
 	settings[0].msg_length = BLOCK_SIZE * sizeof(uint32_t);
 	settings[0].topic = "unsorted";
@@ -245,7 +245,7 @@ int main(int argc, char **argv)
 
 	settings[1].cnt = 1;
 	settings[1].mode = MODE_SUBSCRIBER;
-	settings[1].wait_time = 100000;
+	settings[1].wait_time = 200000;
 	settings[1].msg = (uint8_t*)u32sorted;
 	settings[1].msg_length = BLOCK_SIZE * sizeof(uint32_t);
 	settings[1].topic = "sorted";
