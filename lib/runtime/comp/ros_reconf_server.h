@@ -4,6 +4,7 @@
 #include "ros.h"
 
 #include <rcl_action/action_server.h>
+#include <rcl/time.h>
 
 typedef struct
 {
@@ -14,6 +15,7 @@ typedef struct
 
 
     rcl_action_server_t  action_server;
+    rcl_clock_t clock;
 
 
     uint32_t active_task_id;
