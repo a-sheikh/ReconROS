@@ -2,7 +2,7 @@
 
 CC = $(CROSS_COMPILE)gcc
 CFLAGS += -Wall -I <<REPO_REL>> -I lib/include -I lib/include -I /opt/ros/dashing/include/ -D RECONOS_OS_<<OS>> -D RECONOS_BOARD_<<BOARD>> <<CFLAGS>>
-LDFLAGS += -lpthread <<LDFLAGS>> -Bdynamic -L /opt/ros/dashing/lib/*.so
+LDFLAGS += -lpthread <<LDFLAGS>> -Bdynamic -L /opt/ros/dashing/lib/*.so -L lib/runtime/comp/reconros/lib/*.so
 
 MKDIRP = mkdir -p
 
