@@ -91,11 +91,7 @@ void ros_reconf_server_init( t_ros_reconf_server * ros_reconf_server, struct ros
     ros_reconf_server->ros_node = _ros_node;
 
 
-    rosidl_action_type_support_t * ts = ROSIDL_TYPESUPPORT_INTERFACE__MESSAGE_SYMBOL_NAME(
-    rosidl_typesupport_c,
-    reconros,
-    action,
-    Reconf_GetResult_Response)();
+    const rosidl_action_type_support_t * ts = ROSIDL_GET_ACTION_TYPE_SUPPORT(reconros, Reconf);
 
     rcl_action_server_options_t action_server_options = rcl_action_server_get_default_options();
 

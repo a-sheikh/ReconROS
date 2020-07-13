@@ -21,4 +21,6 @@ typedef struct
 
     uint32_t active_task_id;
 
+    
+
 } t_ros_reconf_server;

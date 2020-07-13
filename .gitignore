@@ -17,3 +17,7 @@ demos/ros_sort_demo/server_app/build.sw/
 demos/ros_sort_demo/server_app/build.hw/
 demos/ros_sort_demo/client_app/client_app
 tools/arm-docker-build/Docker/qemu-arm-static
+demos/reconf_server/server_app/build.sw/reconfserver
+demos/image_filtering/download.sh
+.vscode/settings.json
+demos/reconf_server/client_app/client_app

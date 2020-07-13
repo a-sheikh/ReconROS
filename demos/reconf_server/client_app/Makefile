@@ -1,11 +1,11 @@
 CC = gcc
 
-CFLAGS += -g -Wno-unused-variable -Wall -I ../../../../../reconos/reconos -I lib/runtime/comp/ -I /opt/ros/foyx/include/ -I lib/include 
-LDFLAGS += -lpthread -L /opt/ros/dashing/lib/*.so
+CFLAGS += -g -Wno-unused-variable -Wall -I ../../../../../reconos/reconos -I lib/runtime/comp/ -I /opt/ros/foxy/include/ -I msg_support/install/reconros/include/
+LDFLAGS += -lpthread -L /opt/ros/foxy/lib/*.so -L msg_support/install/reconros/lib/*.so
 
 MKDIRP = mkdir -p
 
-OBJS = lib/comp/ros.o lib/comp/ros_sub.o lib/comp/ros_pub.o application/main.o 
+OBJS = main.o
 
 BUILD_OBJS = $(OBJS:%=_build/%)
 
@@ -13,7 +13,7 @@ all: $(BUILD_OBJS)
 	$(CC) $(BUILD_OBJS) $(LDFLAGS) -o client_app
 
 install: all
-	cp sortdemo $(PREFIX)
+	cp client_app $(PREFIX)
 
 clean:
 	rm -rf _build client_app

@@ -19,6 +19,25 @@
         "set": "c",
         "stack": "c",
         "string": "c",
-        "vector": "c"
+        "vector": "c",
+        "__bit_reference": "c",
+        "__tuple": "c",
+        "*.tcc": "cpp",
+        "functional": "cpp",
+        "iomanip": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "ostream": "cpp",
+        "ratio": "cpp",
+        "sstream": "cpp",
+        "streambuf": "cpp",
+        "__config": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp",
+        "iterator": "cpp",
+        "locale": "cpp",
+        "thread": "cpp",
+        "type_traits": "cpp",
+        "*.txx": "cpp"
     }
 }

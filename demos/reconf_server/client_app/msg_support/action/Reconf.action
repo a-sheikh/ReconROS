@@ -1,0 +1,14 @@
+# Task properties
+uint32 task_id
+uint32 priority
+uint8[] bitstream
+
+#Task data
+uint8[] request_data
+
+---
+#TaskResult
+uint8[] response_data
+---
+#Task dependent feedback  
+uint8[] feedback_data
