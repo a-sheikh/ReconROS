@@ -52,7 +52,21 @@ static int _thread_id;
 
 
 //Time Measurement
-//clock_t start, end;
+struct timespec t_start, t_end, t_res;
+
+void timespec_diff(struct timespec *start, struct timespec *stop,
+                   struct timespec *result)
+{
+    if ((stop->tv_nsec - start->tv_nsec) < 0) {
+        result->tv_sec = stop->tv_sec - start->tv_sec - 1;
+        result->tv_nsec = stop->tv_nsec - start->tv_nsec + 1000000000;
+    } else {
+        result->tv_sec = stop->tv_sec - start->tv_sec;
+        result->tv_nsec = stop->tv_nsec - start->tv_nsec;
+    }
+
+    return;
+}
 
 /* == ReconOS resource ================================================= */
 
@@ -1089,15 +1103,23 @@ static inline int dt_ros_publish(struct hwslot *slot) {
 	int handle, ret;
 	int msg_handle;
 	handle = reconos_osif_read(slot->osif);
+	//Time Measurement	
+	clock_gettime(CLOCK_MONOTONIC, &t_end);
 	RESOURCE_CHECK_TYPE(handle, RECONOS_RESOURCE_TYPE_ROSPUB);
 	msg_handle = reconos_osif_read(slot->osif);
 	RESOURCE_CHECK_TYPE(msg_handle, RECONOS_RESOURCE_TYPE_ROSMSG);
 
+
+
+	
 	debug("[reconos-dt-%d] (ros publish on %d) ...\n", slot->id, handle);
 	SYSCALL_NONBLOCK(ret = ros_publisher_publish(slot->rt->resources[handle].ptr, slot->rt->resources[msg_handle].ptr));
 	debug("[reconos-dt-%d] (ros publish on %d) done\n", slot->id, handle);
 
 	reconos_osif_write(slot->osif, (uint32_t)ret);
+
+	timespec_diff(&t_start, &t_end, &t_res);
+	printf("%3.6f;\n", (double)(t_res.tv_nsec)/1000000000);
 
 	return 0;
 
@@ -1118,7 +1140,8 @@ static inline int dt_ros_take(struct hwslot *slot) {
 	SYSCALL_NONBLOCK(ros_subscriber_message_take(slot->rt->resources[handle].ptr, slot->rt->resources[msg_handle].ptr););
 	debug("[reconos-dt-%d] (ros_take on %d) done\n", slot->id, handle);
 
-	reconos_osif_write(slot->osif, (uint32_t)slot->rt->resources[msg_handle].ptr);
+	clock_gettime(CLOCK_MONOTONIC, &t_start);
+	reconos_osif_write(slot->osif, (uint32_t)slot->rt->resources[msg_handle].ptr);	
 	
 
 	return 0;
@@ -1153,6 +1176,8 @@ static inline int dt_ros_services_response(struct hwslot *slot) {
 	int handle, ret;
 	int msg_handle;
 	handle = reconos_osif_read(slot->osif);
+	//Time Measurement	
+	clock_gettime(CLOCK_MONOTONIC, &t_end);
 	RESOURCE_CHECK_TYPE(handle, RECONOS_RESOURCE_TYPE_ROSSRVS);
 	msg_handle = reconos_osif_read(slot->osif);
 	RESOURCE_CHECK_TYPE(msg_handle, RECONOS_RESOURCE_TYPE_ROSSRVMSGRES);
@@ -1166,6 +1191,9 @@ static inline int dt_ros_services_response(struct hwslot *slot) {
 	debug("[reconos-dt-%d] (ros service response on %d) done\n", slot->id, handle);
 
 	reconos_osif_write(slot->osif, (uint32_t)ret);
+
+	timespec_diff(&t_start, &t_end, &t_res);
+	printf("%3.6f;\n", (double)(t_res.tv_nsec)/1000000000);
 
 	return 0;
 
@@ -1186,11 +1214,10 @@ static inline int dt_ros_services_take(struct hwslot *slot) {
 	SYSCALL_NONBLOCK(ros_service_server_request_take(slot->rt->resources[handle].ptr, slot->rt->resources[msg_handle].ptr););
 	debug("[reconos-dt-%d] (ros service take %d) done\n", slot->id, handle);
 
-	reconos_osif_write(slot->osif, (uint32_t)slot->rt->resources[msg_handle].ptr);
-	
 	//Time Measurement
-	//start = clock();
-
+	clock_gettime(CLOCK_MONOTONIC, &t_start);
+	reconos_osif_write(slot->osif, (uint32_t)slot->rt->resources[msg_handle].ptr);
+		
 	return 0;
 
 intr:
