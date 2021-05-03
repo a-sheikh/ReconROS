@@ -99,7 +99,7 @@ class Slot:
 class Thread:
 	_id = 0
 
-	def __init__(self, name, slots, hw, sw, res, mem, videoout, ports):
+	def __init__(self, name, slots, hw, sw, res, mem,videoin, videoout, ports):
 		self.id = Thread._id
 		Thread._id += 1
 		self.name = name
@@ -107,6 +107,7 @@ class Thread:
 		self.resources = res
 		self.mem = mem
 		self.ports = ports
+		self.videoin = videoin
 		self.videoout = videoout
 		if hw is not None:
 			hw = hw.split(",")
@@ -500,12 +501,18 @@ class Project:
 			else:
 				mem = True
 
-			if cfg.has_option(t, "VideoOut"):
-				videoout = cfg.get(t, "VideoOut") in ["True", "true"]
-				
+			if cfg.has_option(t, "VideoIn"):
+				videoin = re.split(r"[, ]+", cfg.get(t, "VideoIn"))
 			else:
-				videoout = False
+				videoin = []
 
+
+			if cfg.has_option(t, "VideoOut"):
+				videoout = re.split(r"[, ]+", cfg.get(t, "VideoOut"))
+			else:
+				videoout = []
+
+			print("Video In  = " + str(videoin) + "\n")
 			print("Video Out = " + str(videoout) + "\n")
 
 			if cfg.has_option(t, "Ports"):
@@ -515,7 +522,7 @@ class Project:
 
 			log.debug("Found thread '" + str(name) + "' (" + str(slots) + "," + str(hw) + "," + str(sw) + "," + str(res) + ")")
 
-			thread = Thread(name, slots, hw, sw, res, mem, videoout, ports)
+			thread = Thread(name, slots, hw, sw, res, mem, videoin, videoout, ports)
 			for s in slots: s.threads.append(thread)
 			self.threads.append(thread)
 			

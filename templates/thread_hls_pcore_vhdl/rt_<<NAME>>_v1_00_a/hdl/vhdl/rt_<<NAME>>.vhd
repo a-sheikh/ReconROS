@@ -31,15 +31,41 @@ entity rt_<<NAME>> is
 
 		DEBUG : out std_logic_vector(135 downto 0);
 
+
+<<generate for VIDEOIN>>
+		m_axis_video_<<Name>>_TDATA : IN STD_LOGIC_VECTOR (23 downto 0);
+		m_axis_video_<<Name>>_TVALID : IN STD_LOGIC;
+		m_axis_video_<<Name>>_TREADY : OUT STD_LOGIC;
+		m_axis_video_<<Name>>_TKEEP : IN STD_LOGIC_VECTOR (2 downto 0);
+		m_axis_video_<<Name>>_TSTRB : IN STD_LOGIC_VECTOR (2 downto 0);
+		m_axis_video_<<Name>>_TUSER : IN STD_LOGIC_VECTOR (0 downto 0);
+		m_axis_video_<<Name>>_TLAST : IN STD_LOGIC_VECTOR (0 downto 0);
+		m_axis_video_<<Name>>_TID : IN STD_LOGIC_VECTOR (0 downto 0);
+		m_axis_video_<<Name>>_TDEST : IN STD_LOGIC_VECTOR (0 downto 0);
+<<end generate>>
+
+<<generate for VIDEOOUT>>
+		m_axis_video_<<Name>>_TDATA : OUT STD_LOGIC_VECTOR (23 downto 0);
+		m_axis_video_<<Name>>_TVALID : OUT STD_LOGIC;
+		m_axis_video_<<Name>>_TREADY : IN STD_LOGIC;
+		m_axis_video_<<Name>>_TKEEP : OUT STD_LOGIC_VECTOR (2 downto 0);
+		m_axis_video_<<Name>>_TSTRB : OUT STD_LOGIC_VECTOR (2 downto 0);
+		m_axis_video_<<Name>>_TUSER : OUT STD_LOGIC_VECTOR (0 downto 0);
+		m_axis_video_<<Name>>_TLAST : OUT STD_LOGIC_VECTOR (0 downto 0);
+		m_axis_video_<<Name>>_TID : OUT STD_LOGIC_VECTOR (0 downto 0);
+		m_axis_video_<<Name>>_TDEST : OUT STD_LOGIC_VECTOR (0 downto 0);
+<<end generate>>
+
 		debug_port : out std_logic_vector(31 downto 0)
+
+
 	);
 end entity rt_<<NAME>>;
 
 architecture implementation of rt_<<NAME>> is
 	component rt_imp is
 		port (
-			ap_clk : in std_logic;
-			ap_rst : in std_logic;
+
 
 			osif_sw2hw_v_dout    : in std_logic_vector (31 downto 0);
 			osif_sw2hw_v_empty_n : in std_logic;
@@ -55,7 +81,33 @@ architecture implementation of rt_<<NAME>> is
 
 			memif_mem2hwt_v_dout    : in std_logic_vector (31 downto 0);
 			memif_mem2hwt_v_empty_n : in std_logic;
-			memif_mem2hwt_v_read    : out std_logic
+			memif_mem2hwt_v_read    : out std_logic;
+
+<<generate for VIDEOIN>>
+			m_axis_video_<<Name>>_TDATA : IN STD_LOGIC_VECTOR (23 downto 0);
+			m_axis_video_<<Name>>_TVALID : IN STD_LOGIC;
+			m_axis_video_<<Name>>_TREADY : OUT STD_LOGIC;
+			m_axis_video_<<Name>>_TKEEP : IN STD_LOGIC_VECTOR (2 downto 0);
+			m_axis_video_<<Name>>_TSTRB : IN STD_LOGIC_VECTOR (2 downto 0);
+			m_axis_video_<<Name>>_TUSER : IN STD_LOGIC_VECTOR (0 downto 0);
+			m_axis_video_<<Name>>_TLAST : IN STD_LOGIC_VECTOR (0 downto 0);
+			m_axis_video_<<Name>>_TID : IN STD_LOGIC_VECTOR (0 downto 0);
+			m_axis_video_<<Name>>_TDEST : IN STD_LOGIC_VECTOR (0 downto 0);
+<<end generate>>
+
+<<generate for VIDEOOUT>>
+			m_axis_video_<<Name>>_TDATA : OUT STD_LOGIC_VECTOR (23 downto 0);
+			m_axis_video_<<Name>>_TVALID : OUT STD_LOGIC;
+			m_axis_video_<<Name>>_TREADY : IN STD_LOGIC;
+			m_axis_video_<<Name>>_TKEEP : OUT STD_LOGIC_VECTOR (2 downto 0);
+			m_axis_video_<<Name>>_TSTRB : OUT STD_LOGIC_VECTOR (2 downto 0);
+			m_axis_video_<<Name>>_TUSER : OUT STD_LOGIC_VECTOR (0 downto 0);
+			m_axis_video_<<Name>>_TLAST : OUT STD_LOGIC_VECTOR (0 downto 0);
+			m_axis_video_<<Name>>_TID   : OUT STD_LOGIC_VECTOR (0 downto 0);
+			m_axis_video_<<Name>>_TDEST : OUT STD_LOGIC_VECTOR (0 downto 0);
+<<end generate>>
+			ap_clk : in std_logic;
+			ap_rst_n : in std_logic
 		);
   	end component;
 
@@ -106,8 +158,7 @@ begin
 
 	rt_imp_inst : rt_imp
 		port map (
-			ap_clk => HWT_Clk,
-			ap_rst => HWT_Rst,
+
 
 			osif_sw2hw_v_dout    => osif_sw2hw_v_dout,
 			osif_sw2hw_v_empty_n => osif_sw2hw_v_empty_n,
@@ -123,6 +174,32 @@ begin
 
 			memif_mem2hwt_v_dout    => memif_mem2hwt_v_dout,
 			memif_mem2hwt_v_empty_n => memif_mem2hwt_v_empty_n,
-			memif_mem2hwt_v_read    => memif_mem2hwt_v_read
+			memif_mem2hwt_v_read    => memif_mem2hwt_v_read,
+
+<<generate for VIDEOIN>>
+			m_axis_video_<<Name>>_TDATA => m_axis_video_<<Name>>_TDATA, 
+			m_axis_video_<<Name>>_TVALID => m_axis_video_<<Name>>_TVALID,
+			m_axis_video_<<Name>>_TREADY => m_axis_video_<<Name>>_TREADY,
+			m_axis_video_<<Name>>_TKEEP => m_axis_video_<<Name>>_TKEEP,
+			m_axis_video_<<Name>>_TSTRB => m_axis_video_<<Name>>_TSTRB,
+			m_axis_video_<<Name>>_TUSER => m_axis_video_<<Name>>_TUSER, 
+			m_axis_video_<<Name>>_TLAST => m_axis_video_<<Name>>_TLAST, 
+			m_axis_video_<<Name>>_TID => m_axis_video_<<Name>>_TID, 
+			m_axis_video_<<Name>>_TDEST => m_axis_video_<<Name>>_TDEST,
+<<end generate>>
+
+<<generate for VIDEOOUT>>
+			m_axis_video_<<Name>>_TDATA => m_axis_video_<<Name>>_TDATA, 
+			m_axis_video_<<Name>>_TVALID => m_axis_video_<<Name>>_TVALID,
+			m_axis_video_<<Name>>_TREADY => m_axis_video_<<Name>>_TREADY,
+			m_axis_video_<<Name>>_TKEEP => m_axis_video_<<Name>>_TKEEP,
+			m_axis_video_<<Name>>_TSTRB => m_axis_video_<<Name>>_TSTRB,
+			m_axis_video_<<Name>>_TUSER => m_axis_video_<<Name>>_TUSER, 
+			m_axis_video_<<Name>>_TLAST => m_axis_video_<<Name>>_TLAST, 
+			m_axis_video_<<Name>>_TID => m_axis_video_<<Name>>_TID, 
+			m_axis_video_<<Name>>_TDEST => m_axis_video_<<Name>>_TDEST,
+<<end generate>>
+			ap_clk => HWT_Clk,
+			ap_rst_n => not HWT_Rst
 	);	
 end architecture;

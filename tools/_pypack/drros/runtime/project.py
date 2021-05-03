@@ -78,12 +78,14 @@ class Resource:
 # Class representing a slot in the project.
 #
 class Slot:
-	def __init__(self, name, id_, clock, ports):
+	def __init__(self, name, id_, clock, ports, reconfigurable, region):
 		self.name = name
 		self.id = id_
 		self.clock = clock
 		self.threads = []
 		self.ports = ports
+		self.reconfigurable = reconfigurable
+		self.region = region
 
 	def __str__(self):
 		return "Slot '" + self.name + "' (" + str(self.id) + ")"
@@ -97,7 +99,7 @@ class Slot:
 class Thread:
 	_id = 0
 
-	def __init__(self, name, slots, hw, sw, res, mem, videoout, ports):
+	def __init__(self, name, slots, hw, sw, res, mem,videoin, videoout, ports):
 		self.id = Thread._id
 		Thread._id += 1
 		self.name = name
@@ -105,6 +107,7 @@ class Thread:
 		self.resources = res
 		self.mem = mem
 		self.ports = ports
+		self.videoin = videoin
 		self.videoout = videoout
 		if hw is not None:
 			hw = hw.split(",")
@@ -155,6 +158,7 @@ class ImpInfo:
 		self.design = ""
 		self.xil = ""
 		self.hls = ""
+		self.pr = ""
 
 		self.os = ""
 		self.cflags = ""
@@ -244,34 +248,39 @@ class Project:
 	#
 	def _parse_project(self, cfg):
 		self.name = cfg.get("General", "Name")
-		#self.impinfo.board = re.split(r"[, ]+", cfg.get("General", "TargetBoard"))
-		#self.impinfo.part = cfg.get("General", "TargetPart")
-		#self.impinfo.design = cfg.get("General", "ReferenceDesign")
-		#self.impinfo.os = cfg.get("General", "TargetOS")
-		#self.impinfo.xil = cfg.get("General", "TargetXil").split(",")
-		#if cfg.has_option("General", "TargetHls"):
-		#	self.impinfo.hls = cfg.get("General", "TargetHls").split(",")
-		#else:
-		#	self.impinfo.hls = ""
-		#if cfg.has_option("General", "CFlags"):
-		#	self.impinfo.cflags = cfg.get("General", "CFlags")
-		#else:
-		#	self.impinfo.cflags = ""
-		#if cfg.has_option("General", "LdFlags"):
-		#	self.impinfo.ldflags = cfg.get("General", "LdFlags")
-		#else:
-		#	self.impinfo.ldflags = ""
-		log.debug("Found project '" + str(self.name))
+		self.impinfo.board = re.split(r"[, ]+", cfg.get("General", "TargetBoard"))
+		self.impinfo.part = cfg.get("General", "TargetPart")
+		self.impinfo.design = cfg.get("General", "ReferenceDesign")
+		self.impinfo.os = cfg.get("General", "TargetOS")
+		self.impinfo.xil = cfg.get("General", "TargetXil").split(",")
+		if cfg.has_option("General", "TargetHls"):
+			self.impinfo.hls = cfg.get("General", "TargetHls").split(",")
+		else:
+			self.impinfo.hls = ""
+		if cfg.has_option("General", "CFlags"):
+			self.impinfo.cflags = cfg.get("General", "CFlags")
+		else:
+			self.impinfo.cflags = ""
+		if cfg.has_option("General", "LdFlags"):
+			self.impinfo.ldflags = cfg.get("General", "LdFlags")
+		else:
+			self.impinfo.ldflags = ""
+		if cfg.has_option("General", "PartialReconfiguration"):
+			self.impinfo.pr = cfg.get("General", "PartialReconfiguration")
+		else:
+			self.impinfo.pr = "false"
+
+		log.debug("Found project '" + str(self.name) + "' (" + str(self.impinfo.board) + "," + str(self.impinfo.os) + ")")
 
 		self._parse_clocks(cfg)
 		self._parse_resources(cfg)
 		self._parse_slots(cfg)
 		self._parse_threads(cfg)
 
-		#clock = [_ for _ in self.clocks if _.name == cfg.get("General", "SystemClock")]
-		#if not clock:
-		#	log.error("Clock not found")
-		#self.clock = clock[0]
+		clock = [_ for _ in self.clocks if _.name == cfg.get("General", "SystemClock")]
+		if not clock:
+			log.error("Clock not found")
+		self.clock = clock[0]
 
 	#
 	# Internal method parsing the clocks from the project file.
@@ -399,7 +408,23 @@ class Project:
 			for i in r:
 				log.debug("Found slot '" + str(name) + "(" + str(i) + ")" + "' (" + str(id_) + "," + str(clock[0]) + ")")
 
-				slot = Slot(name + "(" + str(i) + ")", id_ + i, clock[0], ports)
+				if cfg.has_option(s, "Reconfigurable"):
+					if cfg.get(s, "Reconfigurable") == "true":
+						reconfigurable = "true"
+						if cfg.has_option(s, "Region_" + str(i)):
+							#region = cfg.get(s, "Region_" + str(i))
+							region = re.split(r"[, ]+", cfg.get(s, "Region_" + str(i)))
+						else:
+							log.error("PL region must be defined for every reconfigurable slot")
+					else:
+						reconfigurable = "false"
+						region = []
+				else:
+					reconfigurable = "false"
+					region = []
+
+				slot = Slot(name + "(" + str(i) + ")", id_ + i, clock[0], ports, reconfigurable, region)
+
 				self.slots.append(slot)
 
 	#
@@ -408,6 +433,22 @@ class Project:
 	#   cfg - configparser referencing the project file
 	#
 	def _parse_threads(self, cfg):
+		# create Reconf HWT so user does not have to define it manually
+		if self.impinfo.pr == "true":
+			name = "Reconf"
+			# associate this thread with all slots, for now we only support a single dummy thread for all of them
+			slots = [_ for _ in self.slots]
+			hw = "vhdl"
+			sw = None
+			# associate with all defined resources
+			res = [_ for _ in self.resources]
+			mem = True
+			ports = []
+
+			thread = Thread(name, slots, hw, sw, res, mem, False, ports)
+			for s in slots: s.threads.append(thread)
+			self.threads.append(thread)
+
 		for t in [_ for _ in cfg.sections() if _.startswith("ReconosThread")]:
 			match = re.search(r"^.*@(?P<name>.+)", t)
 			if match is None:
@@ -460,12 +501,18 @@ class Project:
 			else:
 				mem = True
 
+			if cfg.has_option(t, "VideoIn"):
+				videoin = cfg.get(t, "VideoIn") in ["True", "true"]
+			else:
+				videoin = False
+
+
 			if cfg.has_option(t, "VideoOut"):
 				videoout = cfg.get(t, "VideoOut") in ["True", "true"]
-				
 			else:
 				videoout = False
 
+			print("Video In  = " + str(videoin) + "\n")
 			print("Video Out = " + str(videoout) + "\n")
 
 			if cfg.has_option(t, "Ports"):
@@ -475,7 +522,7 @@ class Project:
 
 			log.debug("Found thread '" + str(name) + "' (" + str(slots) + "," + str(hw) + "," + str(sw) + "," + str(res) + ")")
 
-			thread = Thread(name, slots, hw, sw, res, mem, videoout, ports)
+			thread = Thread(name, slots, hw, sw, res, mem, videoin, videoout, ports)
 			for s in slots: s.threads.append(thread)
 			self.threads.append(thread)
 			
@@ -489,9 +536,9 @@ class Project:
 		# Check if HLS tool is specified when a thread has HLS sources
 		#
 		hlsNeeded = False
-		#for t in self.threads:
-		#	if t.hwsource=="hls":
-		#		hlsNeeded = True
-		#if (hlsNeeded == True) and (self.impinfo.hls==""):
-		#	log.error("Thread has HLS sources, but no HLS tool is specified. Please specify TargetHls variable in General section in build.cfg")
-		#	exit(1)
+		for t in self.threads:
+			if t.hwsource=="hls":
+				hlsNeeded = True
+		if (hlsNeeded == True) and (self.impinfo.hls==""):
+			log.error("Thread has HLS sources, but no HLS tool is specified. Please specify TargetHls variable in General section in build.cfg")
+			exit(1)

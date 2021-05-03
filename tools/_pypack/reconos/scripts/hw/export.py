@@ -219,6 +219,19 @@ def _export_hw_thread_vivado(prj, hwdir, link, thread):
 			d["TypeUpper"] = r.type.upper()
 			dictionary["RESOURCES"].append(d)
 
+		
+		dictionary["VIDEOIN"] = {}
+		for i in enumerate(thread.videoin):
+			d = {}
+			d["Name"] = i.name
+			dictionary["VIDEOIN"].append(d)
+
+		dictionary["VIDEOOUT"] = {}
+		for i in enumerate(thread.videoout):
+			d = {}
+			d["Name"] = i.name
+			dictionary["VIDEOOUT"].append(d)
+
 		log.info("Generating temporary HLS project in " + tmp.name + " ...")
 		prj.apply_template("thread_hls_build", dictionary, tmp.name)
 
@@ -258,6 +271,19 @@ def _export_hw_thread_vivado(prj, hwdir, link, thread):
 			dictionary["NAME"] = thread.name.lower()
 			dictionary["MEM"] = thread.mem
 			dictionary["MEM_N"] = not thread.mem
+
+			dictionary["VIDEOIN"] = {}
+			for i in enumerate(thread.videoin):
+				d = {}
+				d["Name"] = i.name
+				dictionary["VIDEOIN"].append(d)
+
+			dictionary["VIDEOOUT"] = {}
+			for i in enumerate(thread.videoout):
+				d = {}
+				d["Name"] = i.name
+				dictionary["VIDEOOUT"].append(d)
+			
 			srcs = shutil2.join(tmp.name, "hls", "sol", "syn", "vhdl")
 				#HLS instantiates subcores (e.g. floating point units) in VHDL form during the export step
 			#The path above contains only .tcl instantiations, which our IP Packager flow doesn't understand
@@ -269,12 +295,9 @@ def _export_hw_thread_vivado(prj, hwdir, link, thread):
 			dictionary["INCLUDES"] = [{"File": shutil2.trimext(_)} for _ in incls]
 
 			log.info("Generating export files ...")
-			if thread.videoout == 0 :
-				prj.apply_template("thread_hls_pcore_vhdl", dictionary, hwdir)
-			else:
-				print("Found Video Out! \n")
-				prj.apply_template("thread_hls_pcore_video_vhdl", dictionary, hwdir)
-			
+
+			prj.apply_template("thread_hls_pcore_vhdl", dictionary, hwdir)
+
 			#For each slot: Generate .prj file listing sources for PR flow
 			if thread.slots[0].reconfigurable == "true":
 				for _ in thread.slots:
