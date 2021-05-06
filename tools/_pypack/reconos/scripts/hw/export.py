@@ -220,16 +220,16 @@ def _export_hw_thread_vivado(prj, hwdir, link, thread):
 			dictionary["RESOURCES"].append(d)
 
 		
-		dictionary["VIDEOIN"] = {}
-		for i in enumerate(thread.videoin):
+		dictionary["VIDEOIN"] = []
+		for i in thread.videoin:
 			d = {}
-			d["Name"] = i.name
+			d["Name"] = i
 			dictionary["VIDEOIN"].append(d)
 
-		dictionary["VIDEOOUT"] = {}
-		for i in enumerate(thread.videoout):
+		dictionary["VIDEOOUT"] = []
+		for i in thread.videoout:
 			d = {}
-			d["Name"] = i.name
+			d["Name"] = i
 			dictionary["VIDEOOUT"].append(d)
 
 		log.info("Generating temporary HLS project in " + tmp.name + " ...")
@@ -272,16 +272,16 @@ def _export_hw_thread_vivado(prj, hwdir, link, thread):
 			dictionary["MEM"] = thread.mem
 			dictionary["MEM_N"] = not thread.mem
 
-			dictionary["VIDEOIN"] = {}
-			for i in enumerate(thread.videoin):
+			dictionary["VIDEOIN"] = []
+			for i in thread.videoin:
 				d = {}
-				d["Name"] = i.name
+				d["Name"] = i
 				dictionary["VIDEOIN"].append(d)
 
-			dictionary["VIDEOOUT"] = {}
-			for i in enumerate(thread.videoout):
+			dictionary["VIDEOOUT"] = []
+			for i in thread.videoout:
 				d = {}
-				d["Name"] = i.name
+				d["Name"] = i
 				dictionary["VIDEOOUT"].append(d)
 			
 			srcs = shutil2.join(tmp.name, "hls", "sol", "syn", "vhdl")

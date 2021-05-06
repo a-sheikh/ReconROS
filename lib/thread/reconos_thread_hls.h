@@ -52,14 +52,12 @@
  }
  */
 
-<<generate for VIDEOIN>> 
-hls::stream<uint32> <<Name>>, \
-<<end generate>> 
+
 
 
 #define THREAD_ENTRY() void rt_imp( \
-
-
+				<<generate for VIDEOIN>>hls::stream<uint32> <<Name>>,<<end generate>> \
+                <<generate for VIDEOOUT>>hls::stream<uint32> <<Name>>,<<end generate>> \
 				hls::stream<uint32> osif_sw2hw,\
                 hls::stream<uint32> osif_hw2sw,\
                 hls::stream<uint32> memif_hwt2mem,\
