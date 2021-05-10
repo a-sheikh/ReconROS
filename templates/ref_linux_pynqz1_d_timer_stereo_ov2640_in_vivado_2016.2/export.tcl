@@ -168,7 +168,9 @@ proc reconos_hw_setup {new_project_name new_project_path reconos_ip_dir} {
     set_property  ip_repo_paths  $reconos_ip_dir [current_project]
     update_ip_catalog
 
-	
+    set_property  ip_repo_paths  {/home/christian/git/OV2640_Pynq-Z1/build.hw/pcores /home/christian/git/OV2640_Pynq-Z1/repo} [current_project] 
+  	update_ip_catalog
+
     # Add system reset module
     create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 reset_0
 
@@ -615,6 +617,18 @@ CONFIG.enable_detection {false} \
 
     set_property -dict [list CONFIG.PCW_EN_RST1_PORT {1}] [get_bd_cells processing_system7_0]
     connect_bd_net [get_bd_pins pynq_hdmi_out/axi4s_resetn] [get_bd_pins processing_system7_0/FCLK_RESET1_N]
+
+
+    startgroup
+    create_bd_cell -type ip -vlnv xilinx.com:user:camera2640_module:1.0 camera2640_module_0
+    endgroup
+    connect_bd_intf_net [get_bd_intf_pins camera2640_module_0/m_axis] [get_bd_intf_pins slot_0/Cam1]
+    startgroup
+    make_bd_pins_external  [get_bd_pins camera2640_module_0/href] [get_bd_pins camera2640_module_0/pclk] [get_bd_pins camera2640_module_0/scl] [get_bd_pins camera2640_module_0/vsync] [get_bd_pins camera2640_module_0/debug] [get_bd_pins camera2640_module_0/capture] [get_bd_pins camera2640_module_0/sda] [get_bd_pins camera2640_module_0/data_in]
+    endgroup
+    connect_bd_net [get_bd_pins camera2640_module_0/m_axis_aclk] [get_bd_pins reconos_clock_0/CLK0_Out]
+    connect_bd_net [get_bd_pins camera2640_module_0/m_axis_aresetn] [get_bd_pins reconos_proc_control_0/PROC_Hwt_Rst_0]
+
     
     #
     # Memory Map of peripheperals

@@ -24,6 +24,7 @@
 #define RECONOS_THREAD_H
 
 #include "hls_stream.h"
+#include "ap_axi_sdata.h"
 #include "ap_cint.h"
 #include "ap_int.h"
 #include "ap_fixed.h"
@@ -52,12 +53,12 @@
  }
  */
 
-
+typedef ap_axis<32,1,1,1> t_stream;
 
 
 #define THREAD_ENTRY() void rt_imp( \
-				<<generate for VIDEOIN>>hls::stream<uint32> <<Name>>,<<end generate>> \
-                <<generate for VIDEOOUT>>hls::stream<uint32> <<Name>>,<<end generate>> \
+				<<generate for VIDEOIN>> hls::stream<t_stream> <<Name>>,<<end generate>> \
+                <<generate for VIDEOOUT>>hls::stream<t_stream> <<Name>>,<<end generate>> \
 				hls::stream<uint32> osif_sw2hw,\
                 hls::stream<uint32> osif_hw2sw,\
                 hls::stream<uint32> memif_hwt2mem,\
