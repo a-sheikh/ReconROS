@@ -38,8 +38,6 @@ demos/*/client_app/sorter_client/install
 demos/*/client_app/sorter_client/include
 demos/*/client_app/sorter_client/log
 
-tools/arm-docker-build/Docker/qemu-arm-static
-
 lib/pcores/hdl
 
 COLCON_IGNORE
