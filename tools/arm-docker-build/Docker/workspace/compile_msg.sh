@@ -3,7 +3,7 @@
 cd /mnt/project/build.msg/
 
 source /mnt/reconos/tools/settings.sh
-source /opt/ros/dashing/setup.bash
+source /opt/ros/foxy/setup.bash
 
 #build costum messages
 colcon build
